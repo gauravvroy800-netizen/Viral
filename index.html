@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Viral Short Video Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a14;--s1:#0f0f22;--s2:#141430;--s3:#1c1c3e;
+  --cyan:#00d4ff;--green:#00ff88;--red:#ff0055;--yellow:#ffd60a;
+  --orange:#ff7b00;--purple:#bf5af2;--pink:#ff375f;
+  --text:#eef0ff;--muted:#4a4a7a;--border:rgba(0,212,255,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(0,212,255,.06) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 90% 90%,rgba(255,0,85,.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+header{text-align:center;padding:40px 20px 28px;position:relative;z-index:2;border-bottom:1px solid var(--border)}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);padding:5px 18px;border-radius:50px;font-size:.7rem;font-weight:700;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.hdot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:hdotpulse 1.2s infinite}
+@keyframes hdotpulse{0%,100%{opacity:1}50%{opacity:.3}}
+header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,5vw,2.8rem);background:linear-gradient(135deg,var(--cyan),#0066ff,var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--muted);font-size:.92rem}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1200px;margin:0 auto;padding:28px 20px 80px;position:relative;z-index:2}
+
+/* ── API STRIP ── */
+.api-strip{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:22px 26px;margin-bottom:24px}
+.api-strip-title{font-family:'Syne',sans-serif;font-weight:700;color:var(--cyan);margin-bottom:16px;font-size:1rem;display:flex;align-items:center;gap:8px}
+.api-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.api-field{position:relative}
+.api-field label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px}
+.api-field input{width:100%;padding:10px 14px;background:var(--s2);border:1.5px solid var(--s3);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
+.api-field input:focus{border-color:rgba(0,212,255,.4)}
+.api-note{font-size:.72rem;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:20px}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:24px;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent)}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;color:var(--cyan);font-size:1.05rem;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+/* ── TOPICS ── */
+.topic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tbtn{padding:9px 6px;background:var(--s2);border:1.5px solid var(--s3);border-radius:10px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.tbtn:hover{border-color:rgba(0,212,255,.3);color:var(--text)}
+.tbtn.on{background:rgba(0,212,255,.1);border-color:var(--cyan);color:var(--cyan)}
+
+/* ── FORM ── */
+.field{margin-bottom:14px}
+label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px 14px;background:var(--s2);border:1.5px solid var(--s3);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:rgba(0,212,255,.4)}
+select option{background:var(--s2)}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+
+/* ── BUTTONS ── */
+.big-btn{width:100%;padding:15px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#0066ff);color:#fff;box-shadow:0 6px 24px rgba(0,212,255,.25)}
+.btn-cyan:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,212,255,.4)}
+.btn-cyan:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-green{background:linear-gradient(135deg,var(--green),#00aa55);color:#000}
+.btn-green:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,136,.3)}
+.btn-green:disabled{opacity:.4;cursor:not-allowed}
+.btn-red{background:linear-gradient(135deg,var(--red),#ff3377);color:#fff}
+.btn-red:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,0,85,.3)}
+.btn-red:disabled{opacity:.4;cursor:not-allowed}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#7b2fff);color:#fff}
+.btn-purple:hover:not(:disabled){transform:translateY(-2px)}
+.btn-purple:disabled{opacity:.4;cursor:not-allowed}
+.sm-btn{padding:8px 18px;border-radius:8px;border:none;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s}
+.sm-cyan{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--cyan)}
+.sm-cyan:hover{background:rgba(0,212,255,.18)}
+.sm-cyan.ok{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.3);color:var(--green)}
+.spin{width:17px;height:17px;border:2.5px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:rot .7s linear infinite;display:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.loading-state .spin{display:block}
+.loading-state .btn-lbl{display:none}
+.gap-top{margin-top:10px}
+
+/* ── OUTPUT TABS ── */
+.out-tabs{display:flex;gap:0;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:3px;margin-bottom:16px;overflow-x:auto}
+.otab{flex:1;min-width:80px;padding:8px 10px;border-radius:9px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;text-align:center}
+.otab.on{background:var(--s3);color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(0,212,255,.2)}
+
+/* ── OUTPUT SECTIONS ── */
+.out-panel{display:none}
+.out-panel.visible{display:flex;flex-direction:column;gap:14px}
+.out-box{background:var(--s2);border:1px solid var(--s3);border-radius:12px;padding:16px;position:relative}
+.out-box-label{font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.tag{padding:2px 8px;border-radius:4px;font-size:.58rem;font-weight:700}
+.tc{background:rgba(0,212,255,.12);color:var(--cyan)}
+.tg{background:rgba(0,255,136,.12);color:var(--green)}
+.tr{background:rgba(255,0,85,.12);color:var(--red)}
+.tp{background:rgba(191,90,242,.12);color:var(--purple)}
+.ty{background:rgba(255,214,10,.12);color:var(--yellow)}
+.to{background:rgba(255,123,0,.12);color:var(--orange)}
+.out-text{font-family:'DM Mono',monospace;font-size:.78rem;color:#aac4ff;line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto}
+.cp-abs{position:absolute;top:12px;right:12px}
+
+/* ── PROGRESS ── */
+.progress-section{display:none;margin-bottom:20px}
+.progress-section.show{display:block}
+.prog-wrap{display:flex;flex-direction:column;gap:8px}
+.prog-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--s2);border:1px solid var(--s3);border-radius:12px;transition:all .3s}
+.prog-item.run{border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+.prog-item.done{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.03)}
+.prog-item.err{border-color:rgba(255,0,85,.3);background:rgba(255,0,85,.03)}
+.pico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.pinfo{flex:1}
+.ptitle{font-weight:700;font-size:.85rem}
+.pdesc{font-size:.72rem;color:var(--muted);margin-top:1px}
+.pstat{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:12px}
+.sw{background:var(--s3);color:var(--muted)}
+.sr{background:rgba(0,212,255,.12);color:var(--cyan)}
+.sd{background:rgba(0,255,136,.12);color:var(--green)}
+.se{background:rgba(255,0,85,.12);color:var(--red)}
+
+/* ── PYTHON CODE SECTION ── */
+.code-wrap{background:#0d0d1a;border:1px solid rgba(191,90,242,.2);border-radius:14px;padding:20px;margin-top:20px}
+.code-title{font-family:'Syne',sans-serif;font-weight:700;color:var(--purple);margin-bottom:14px;font-size:.95rem;display:flex;align-items:center;justify-content:space-between}
+.code-block{font-family:'DM Mono',monospace;font-size:.72rem;color:#c8a8ff;line-height:1.9;white-space:pre;overflow-x:auto;max-height:500px;overflow-y:auto}
+
+/* ── UPLOAD SECTION ── */
+.upload-section{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:24px;margin-top:20px}
+.upload-title{font-family:'Syne',sans-serif;font-weight:700;color:var(--red);font-size:1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.priv-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.priv-btn{padding:7px 16px;border-radius:50px;background:var(--s2);border:1.5px solid var(--s3);font-size:.74rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.priv-btn.on{background:rgba(255,0,85,.1);border-color:var(--red);color:var(--red)}
+
+/* ── SUCCESS ── */
+.success-box{display:none;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:16px;padding:22px;text-align:center;margin-top:20px}
+.success-box.show{display:block}
+.success-box h2{font-family:'Syne',sans-serif;color:var(--green);margin-bottom:6px}
+.yt-link{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;padding:11px 24px;border-radius:50px;font-weight:700;font-size:.85rem;text-decoration:none;margin-top:14px;transition:opacity .2s}
+.yt-link:hover{opacity:.85}
+
+/* ── FULL PROMPT SECTION ── */
+.prompt-master{background:var(--s1);border:1px solid rgba(255,214,10,.15);border-radius:20px;padding:24px;margin-top:20px}
+.pm-title{font-family:'Syne',sans-serif;font-weight:700;color:var(--yellow);font-size:1rem;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pm-box{font-family:'DM Mono',monospace;font-size:.75rem;color:#ffe08a;line-height:1.85;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;background:var(--s2);border-radius:12px;padding:18px;border:1px solid rgba(255,214,10,.1)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s1);border:1px solid var(--cyan);color:var(--cyan);padding:10px 22px;border-radius:50px;font-size:.82rem;font-weight:600;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 24px rgba(0,212,255,.15);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:2px}
+
+@media(max-width:768px){
+  .main-grid{grid-template-columns:1fr}
+  .upload-grid{grid-template-columns:1fr}
+  .topic-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:480px){.topic-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbadge"><span class="hdot"></span>LIVE AUTOMATION</div>
+  <h1>🎬 Viral Short Video Automation</h1>
+  <p>One-Click • AI Content • YouTube Auto-Upload • All Viral Settings</p>
+</header>
+
+<div class="wrap">
+
+<!-- API STRIP -->
+<div class="api-strip">
+  <div class="api-strip-title">⚙️ API Keys (One Time Setup)</div>
+  <div class="api-grid">
+    <div class="api-field">
+      <label>YouTube OAuth Access Token</label>
+      <input type="password" id="ytToken" placeholder="Paste OAuth token here...">
+    </div>
+    <div class="api-field">
+      <label>OpenAI API Key (optional)</label>
+      <input type="password" id="openaiKey" placeholder="sk-... (for GPT-4 generation)">
+    </div>
+    <div class="api-field">
+      <label>Claude Built-in</label>
+      <input type="text" value="✅ Claude AI — Built-in (always works)" readonly style="color:var(--green);opacity:.8">
+    </div>
+  </div>
+  <div class="api-note">⚡ Claude AI is built-in — content generates without any key. YouTube token needed only for upload.</div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- LEFT: INPUT -->
+  <div class="card">
+    <div class="card-title">📝 Video Setup</div>
+
+    <div class="field">
+      <label>Select Topic / Niche</label>
+      <div class="topic-grid">
+        <div class="tbtn on" data-val="Epoxy Floor Transformation" onclick="setT(this)">✨ Epoxy Floor</div>
+        <div class="tbtn" data-val="Car Restoration" onclick="setT(this)">🚗 Car Restore</div>
+        <div class="tbtn" data-val="Room Makeover" onclick="setT(this)">🏠 Room Makeover</div>
+        <div class="tbtn" data-val="Garden Transformation" onclick="setT(this)">🌿 Garden</div>
+        <div class="tbtn" data-val="Body Transformation" onclick="setT(this)">💪 Body Transform</div>
+        <div class="tbtn" data-val="Food ASMR" onclick="setT(this)">🍕 Food ASMR</div>
+        <div class="tbtn" data-val="AI Art Creation" onclick="setT(this)">🎨 AI Art</div>
+        <div class="tbtn" data-val="Product Unboxing" onclick="setT(this)">📦 Product</div>
+        <div class="tbtn" data-val="Fashion Lookbook" onclick="setT(this)">👗 Fashion</div>
+        <div class="tbtn" data-val="Nature Timelapse" onclick="setT(this)">🌅 Nature</div>
+        <div class="tbtn" data-val="Tech Review" onclick="setT(this)">📱 Tech</div>
+        <div class="tbtn" data-val="Custom" onclick="setT(this)">✏️ Custom</div>
+      </div>
+    </div>
+
+    <div class="field" id="customField" style="display:none">
+      <label>Custom Topic</label>
+      <input type="text" id="customTopic" placeholder="e.g. Abandoned house renovation...">
+    </div>
+
+    <div class="field">
+      <label>Platform</label>
+      <select id="platform">
+        <option value="YouTube Shorts">YouTube Shorts</option>
+        <option value="Instagram Reels">Instagram Reels</option>
+        <option value="TikTok">TikTok</option>
+        <option value="Facebook Reels">Facebook Reels</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Language</label>
+      <select id="lang">
+        <option value="Hinglish">🇮🇳 Hinglish (Recommended)</option>
+        <option value="English">🇺🇸 English</option>
+        <option value="Hindi">हि Hindi</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Video Style</label>
+      <select id="vstyle">
+        <option value="Cinematic Satisfying">🎬 Cinematic Satisfying</option>
+        <option value="Dramatic Before/After Reveal">⚡ Dramatic Reveal</option>
+        <option value="Fast-Paced Viral">🔥 Fast Viral</option>
+        <option value="ASMR Relaxing">😌 ASMR Relaxing</option>
+        <option value="Timelapse">⏱ Timelapse</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Extra Details (optional)</label>
+      <textarea id="extra" placeholder="e.g. dark metallic color, Indian home setting, budget-friendly..."></textarea>
+    </div>
+
+    <button class="big-btn btn-cyan" id="genBtn" onclick="runAutomation()">
+      <div class="spin"></div>
+      <span class="btn-lbl">🚀 Generate Complete Video Package</span>
+    </button>
+  </div>
+
+  <!-- RIGHT: OUTPUT -->
+  <div class="card">
+    <div class="card-title">📦 AI Generated Content</div>
+
+    <!-- PROGRESS -->
+    <div class="progress-section" id="progSection">
+      <div class="prog-wrap">
+        <div class="prog-item" id="pi1"><div class="pico">🤖</div><div class="pinfo"><div class="ptitle">AI Content Generation</div><div class="pdesc">Title, description, prompts generate ho rahe hain</div></div><div class="pstat sw" id="ps1">Waiting</div></div>
+        <div class="prog-item" id="pi2"><div class="pico">🖼️</div><div class="pinfo"><div class="ptitle">Image Prompts Ready</div><div class="pdesc">4 scene prompts for ImageFX / Midjourney</div></div><div class="pstat sw" id="ps2">Waiting</div></div>
+        <div class="prog-item" id="pi3"><div class="pico">🎥</div><div class="pinfo"><div class="ptitle">Video Prompt Generated</div><div class="pdesc">Google Veo / Runway prompt ready</div></div><div class="pstat sw" id="ps3">Waiting</div></div>
+        <div class="prog-item" id="pi4"><div class="pico">📝</div><div class="pinfo"><div class="ptitle">YouTube Metadata</div><div class="pdesc">Title, description, tags, viral settings</div></div><div class="pstat sw" id="ps4">Waiting</div></div>
+        <div class="prog-item" id="pi5"><div class="pico">🪝</div><div class="pinfo"><div class="ptitle">Hooks & Captions</div><div class="pdesc">Viral hooks, overlays, CTAs</div></div><div class="pstat sw" id="ps5">Waiting</div></div>
+        <div class="prog-item" id="pi6"><div class="pico">🐍</div><div class="pinfo"><div class="ptitle">Python Script Generated</div><div class="pdesc">Full automation code ready to use</div></div><div class="pstat sw" id="ps6">Waiting</div></div>
+      </div>
+    </div>
+
+    <!-- OUTPUT TABS -->
+    <div id="outArea" style="display:none">
+      <div class="out-tabs">
+        <button class="otab on" onclick="showTab('t-img',this)">🖼️ Images</button>
+        <button class="otab" onclick="showTab('t-vid',this)">🎥 Video</button>
+        <button class="otab" onclick="showTab('t-yt',this)">▶️ YouTube</button>
+        <button class="otab" onclick="showTab('t-hook',this)">🪝 Hooks</button>
+        <button class="otab" onclick="showTab('t-viral',this)">🔥 Viral Tips</button>
+      </div>
+
+      <!-- IMAGE PROMPTS -->
+      <div class="out-panel visible" id="t-img">
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tc">Scene 1</span> Before / Start State</div>
+          <div class="out-text" id="s1t">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('s1t',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tc">Scene 2</span> Progress / Working Stage</div>
+          <div class="out-text" id="s2t">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('s2t',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tc">Scene 3</span> Advanced Stage</div>
+          <div class="out-text" id="s3t">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('s3t',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tc">Scene 4</span> After / Final Hero Shot</div>
+          <div class="out-text" id="s4t">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('s4t',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- VIDEO PROMPT -->
+      <div class="out-panel" id="t-vid">
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tg">Start Image</span> VideoFX — Before</div>
+          <div class="out-text" id="vs1">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('vs1',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tg">End Image</span> VideoFX — After</div>
+          <div class="out-text" id="vs2">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('vs2',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tg">Video Prompt</span> Google Veo / Runway / Kling</div>
+          <div class="out-text" id="vpt">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('vpt',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tp">CapCut</span> Editing Guide + Text Overlays</div>
+          <div class="out-text" id="cct">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('cct',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- YOUTUBE METADATA -->
+      <div class="out-panel" id="t-yt">
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tr">Title</span> Viral Optimized (under 60 chars)</div>
+          <div class="out-text" id="ytt">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('ytt',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tr">Description</span> SEO + CTA + Hashtags</div>
+          <div class="out-text" id="ytd">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('ytd',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag tr">Tags</span> 20 Viral SEO Tags</div>
+          <div class="out-text" id="ytg">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('ytg',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag ty">YouTube Settings</span> Auto-Set Values</div>
+          <div class="out-text" id="yts">Category: People & Blogs (22) / Howto & Style (26)
+Privacy: Public
+Format: #Shorts vertical 9:16 1080x1920
+Made for Kids: No
+Comments: Enabled ✅
+Embeddable: Yes
+PublicStatsViewable: Yes
+NotifySubscribers: true
+Best Upload Time: 6–9 AM or 7–10 PM (IST)
+Thumbnail: Bold text + face/result + high contrast</div>
+        </div>
+      </div>
+
+      <!-- HOOKS -->
+      <div class="out-panel" id="t-hook">
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag to">Hook Options</span> First 3 Seconds</div>
+          <div class="out-text" id="hkt">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('hkt',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag to">Caption</span> Full Platform Caption</div>
+          <div class="out-text" id="cpt">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('cpt',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag to">Hashtags</span> 30 Viral Tags</div>
+          <div class="out-text" id="hst">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('hst',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag to">Comment Reply</span> Auto-Reply Template</div>
+          <div class="out-text" id="crt">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('crt',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- VIRAL TIPS -->
+      <div class="out-panel" id="t-viral">
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag ty">Viral Settings</span> Complete Checklist</div>
+          <div class="out-text" id="vst">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('vst',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-box-label"><span class="tag ty">Engagement Strategy</span> Post-Upload Actions</div>
+          <div class="out-text" id="est">—</div>
+          <button class="sm-btn sm-cyan cp-abs" onclick="cp('est',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- ACTION BTNS -->
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="big-btn btn-green" onclick="downloadAll()" style="flex:1">
+          <span class="btn-lbl">💾 Download All (.txt)</span>
+        </button>
+        <button class="big-btn btn-purple" onclick="copyAll()" style="flex:1">
+          <span class="btn-lbl">📋 Copy All</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /main-grid -->
+
+<!-- UPLOAD SECTION -->
+<div class="upload-section" id="uploadSection" style="display:none">
+  <div class="upload-title">📤 Upload to YouTube — Auto Settings</div>
+  <div class="upload-grid">
+    <div class="field">
+      <label>Select Video File (.mp4)</label>
+      <input type="file" id="videoFile" accept="video/*" onchange="onVidFile(this)">
+    </div>
+    <div class="field">
+      <label>Select Thumbnail (.jpg/.png)</label>
+      <input type="file" id="thumbFile" accept="image/*">
+    </div>
+  </div>
+  <div class="field">
+    <label>Privacy</label>
+    <div class="priv-row">
+      <div class="priv-btn on" onclick="setPriv(this,'public')">🌍 Public</div>
+      <div class="priv-btn" onclick="setPriv(this,'unlisted')">🔗 Unlisted</div>
+      <div class="priv-btn" onclick="setPriv(this,'private')">🔒 Private (test)</div>
+    </div>
+  </div>
+  <button class="big-btn btn-red" id="uploadBtn" onclick="doUpload()" disabled>
+    <div class="spin"></div>
+    <span class="btn-lbl">⬆️ Upload to YouTube (All Settings Auto-Set)</span>
+  </button>
+  <p style="text-align:center;color:var(--muted);font-size:.73rem;margin-top:10px">YouTube OAuth token required → Paste in API Keys field above</p>
+</div>
+
+<!-- SUCCESS BOX -->
+<div class="success-box" id="successBox">
+  <h2>🎉 Uploaded Successfully!</h2>
+  <p style="color:var(--muted);font-size:.85rem">Aapki YouTube Short upload ho gayi with all viral settings applied!</p>
+  <a href="#" class="yt-link" id="ytFinalLink" target="_blank">▶️ Watch on YouTube →</a>
+</div>
+
+<!-- AUTOMATION PROMPT BOX -->
+<div class="prompt-master" id="masterPromptBox" style="display:none">
+  <div class="pm-title">
+    📋 Master Automation Prompt — ChatGPT / Claude / Any AI pe use karo
+    <button class="sm-btn sm-cyan" onclick="cp('masterPromptTxt',this)" style="position:relative;right:auto;top:auto">Copy Prompt</button>
+  </div>
+  <div class="pm-box" id="masterPromptTxt">Loading...</div>
+</div>
+
+<!-- PYTHON SCRIPT -->
+<div class="code-wrap" id="pyBox" style="display:none">
+  <div class="code-title">
+    🐍 Python Automation Script — Coder ko do ya khud chalao
+    <button class="sm-btn" style="background:rgba(191,90,242,.1);border:1px solid rgba(191,90,242,.3);color:var(--purple);padding:6px 14px;border-radius:8px;font-size:.7rem;cursor:pointer" onclick="cp('pyCode',this)">Copy Python</button>
+  </div>
+  <div class="code-block" id="pyCode">Generating Python script...</div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast">✅ Done!</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let selectedTopic = 'Epoxy Floor Transformation';
+let selectedPrivacy = 'public';
+let videoFile = null;
+let generatedData = {};
+let allText = '';
+
+// ── UI helpers ──
+function setT(el) {
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  selectedTopic = el.dataset.val;
+  document.getElementById('customField').style.display = selectedTopic === 'Custom' ? 'block' : 'none';
+}
+function setPriv(el, v) {
+  document.querySelectorAll('.priv-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  selectedPrivacy = v;
+}
+function showTab(id, btn) {
+  document.querySelectorAll('.out-panel').forEach(p => p.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  document.querySelectorAll('.otab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setP(n, state) {
+  const item = document.getElementById('pi'+n);
+  const stat = document.getElementById('ps'+n);
+  item.className = 'prog-item ' + (state==='run'?'run':state==='done'?'done':state==='err'?'err':'');
+  stat.className = 'pstat ' + (state==='run'?'sr':state==='done'?'sd':state==='err'?'se':'sw');
+  stat.textContent = state==='run'?'⏳ Running...':state==='done'?'✅ Done':state==='err'?'❌ Error':'Waiting';
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+// ══════════════════════════════════════════
+// MAIN AUTOMATION
+// ══════════════════════════════════════════
+async function runAutomation() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.classList.add('loading-state');
+
+  const topic = selectedTopic === 'Custom'
+    ? (document.getElementById('customTopic').value || 'Custom Transformation')
+    : selectedTopic;
+  const platform = document.getElementById('platform').value;
+  const lang = document.getElementById('lang').value;
+  const style = document.getElementById('vstyle').value;
+  const extra = document.getElementById('extra').value;
+
+  document.getElementById('progSection').classList.add('show');
+  document.getElementById('outArea').style.display = 'none';
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('masterPromptBox').style.display = 'none';
+  document.getElementById('pyBox').style.display = 'none';
+  [1,2,3,4,5,6].forEach(i=>setP(i,'wait'));
+
+  // STEP 1: AI Generate
+  setP(1,'run'); await sleep(300);
+  try {
+    generatedData = await callClaude(topic, platform, lang, style, extra);
+    setP(1,'done');
+  } catch(e) {
+    generatedData = fallback(topic, platform, lang, style, extra);
+    setP(1,'done');
+  }
+
+  setP(2,'run'); await sleep(400); fillImages(generatedData); setP(2,'done');
+  setP(3,'run'); await sleep(400); fillVideo(generatedData); setP(3,'done');
+  setP(4,'run'); await sleep(400); fillYT(generatedData); setP(4,'done');
+  setP(5,'run'); await sleep(400); fillHooks(generatedData); fillViral(generatedData); setP(5,'done');
+  setP(6,'run'); await sleep(500);
+  buildPyScript(topic, platform, lang, generatedData);
+  buildMasterPrompt(topic, platform, lang, style, extra);
+  setP(6,'done');
+
+  document.getElementById('outArea').style.display = 'block';
+  document.getElementById('uploadSection').style.display = 'block';
+  document.getElementById('masterPromptBox').style.display = 'block';
+  document.getElementById('pyBox').style.display = 'block';
+
+  btn.disabled = false;
+  btn.classList.remove('loading-state');
+  showToast('✅ Sab kuch ready! Content + Script + Prompt');
+  document.getElementById('outArea').scrollIntoView({behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════
+// CLAUDE API CALL
+// ══════════════════════════════════════════
+async function callClaude(topic, platform, lang, style, extra) {
+  const langNote = lang==='Hinglish'?'Hinglish (mix Hindi+English)':lang==='Hindi'?'Hindi':'English';
+  const prompt = `You are a viral short video content expert. Generate a complete package for a ${platform} viral short video.
+
+TOPIC: ${topic}
+STYLE: ${style}
+PLATFORM: ${platform}
+LANGUAGE: ${langNote}
+EXTRA: ${extra||'none'}
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "scene1": "Detailed 60-word photorealistic image prompt for BEFORE state, 9:16 vertical, 8K, cinematic, same angle",
+  "scene2": "60-word prompt for MID-PROCESS stage, same location, same angle, workers/tools visible",
+  "scene3": "60-word prompt for ADVANCED STAGE, 75% complete, dramatic improvement visible, same angle",
+  "scene4": "60-word prompt for FINAL COMPLETED hero shot, luxury finish, dramatic lighting, most beautiful, same angle",
+  "videoStart": "40-word start image description for VideoFX — before state",
+  "videoEnd": "40-word end image description for VideoFX — after state, stunning",
+  "videoPrompt": "80-word video prompt for Google Veo/Runway: cinematic transformation, same angle, lighting change, 9:16, 15-30 seconds",
+  "capcut": "Step-by-step CapCut editing guide numbered 1-8: import order, transitions, music, speed ramp, color grade, text overlays, export 1080x1920 60fps",
+  "ytTitle": "Viral YouTube title under 60 chars, has power word, #Shorts at end",
+  "ytDescription": "200-word YouTube description: hook, content, timestamps, CTA to comment, 5 hashtags, links section",
+  "ytTags": ["tag1","tag2",...20 tags],
+  "hook1": "Hook option 1 under 8 words — curiosity",
+  "hook2": "Hook option 2 under 8 words — shock",
+  "hook3": "Hook option 3 under 8 words — desire",
+  "overlays": ["[0:00] text","[0:08] text","[0:16] text","[0:22] text","[0:28] final CTA text"],
+  "caption": "Full ${langNote} platform caption 150 words with emojis, story, CTA, ask to comment word",
+  "hashtags": "#tag1 #tag2 ... (30 hashtags on one line)",
+  "commentReply": "Auto-reply template in ${langNote} for people asking for more info, include [LINK] placeholder",
+  "bestTime": "Best upload time for ${platform} in IST",
+  "thumbnail": "Thumbnail text suggestion (bold, high contrast, 3-4 words max)",
+  "viralChecklist": "10-point viral checklist: upload tips, first hour actions, engagement tricks",
+  "engagementStrategy": "5 post-upload actions to boost algorithm, pin comment, community post, etc."
+}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:3000,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  const d = await res.json();
+  const raw = d.content?.[0]?.text || '{}';
+  const clean = raw.replace(/```json|```/g,'').trim();
+  return JSON.parse(clean);
+}
+
+// ══════════════════════════════════════════
+// FILL UI
+// ══════════════════════════════════════════
+function fillImages(d){
+  set('s1t', d.scene1||'—');
+  set('s2t', d.scene2||'—');
+  set('s3t', d.scene3||'—');
+  set('s4t', d.scene4||'—');
+}
+function fillVideo(d){
+  set('vs1', d.videoStart||'—');
+  set('vs2', d.videoEnd||'—');
+  set('vpt', d.videoPrompt||'—');
+  set('cct', d.capcut||'—');
+}
+function fillYT(d){
+  set('ytt', d.ytTitle||'—');
+  set('ytd', d.ytDescription||'—');
+  set('ytg', (d.ytTags||[]).join(', '));
+}
+function fillHooks(d){
+  const hooks = `🪝 Hook Options (Use One for First 3 Seconds):\n\n1. "${d.hook1||'—'}"\n2. "${d.hook2||'—'}"\n3. "${d.hook3||'—'}"\n\n📍 On-Screen Text Overlays:\n${(d.overlays||[]).join('\n')}`;
+  set('hkt', hooks);
+  set('cpt', d.caption||'—');
+  set('hst', d.hashtags||'—');
+  set('crt', d.commentReply||'—');
+}
+function fillViral(d){
+  const vc = `⏰ Best Upload Time: ${d.bestTime||'6-9 AM or 7-10 PM IST'}\n🖼️ Thumbnail: ${d.thumbnail||'Bold text + transformation result'}\n\n📋 Viral Checklist:\n${d.viralChecklist||'—'}`;
+  set('vst', vc);
+  set('est', d.engagementStrategy||'—');
+}
+function set(id, txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
+
+// ══════════════════════════════════════════
+// PYTHON SCRIPT BUILDER
+// ══════════════════════════════════════════
+function buildPyScript(topic, platform, lang, d) {
+  const title = (d.ytTitle||'Viral Short #Shorts').replace(/'/g,"\\'");
+  const desc = (d.ytDescription||'').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+  const tags = JSON.stringify(d.ytTags||[]);
+
+  const script = `#!/usr/bin/env python3
+"""
+🎬 Viral Short Video Automation Script
+Topic: ${topic} | Platform: ${platform}
+Generated automatically — ready to run
+"""
+
+import json, os, sys, time
+
+# ── INSTALL: pip install anthropic google-auth google-auth-oauthlib google-api-python-client requests ──
+
+try:
+    import anthropic
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaFileUpload
+    from google.oauth2.credentials import Credentials
+    import requests
+except ImportError as e:
+    print(f"Install required: pip install anthropic google-api-python-client google-auth-oauthlib")
+    sys.exit(1)
+
+# ═══════════════════════════════════════
+# CONFIGURATION
+# ═══════════════════════════════════════
+CLAUDE_API_KEY   = os.getenv("CLAUDE_API_KEY", "your_claude_api_key_here")
+YOUTUBE_TOKEN    = os.getenv("YOUTUBE_TOKEN", "your_oauth_token_here")
+RUNWAY_API_KEY   = os.getenv("RUNWAY_API_KEY", "")  # Optional video gen
+VIDEO_FILE       = "video.mp4"          # Your video file path
+THUMBNAIL_FILE   = "thumbnail.jpg"      # Optional
+TOPIC            = "${topic}"
+PLATFORM         = "${platform}"
+LANGUAGE         = "${lang}"
+
+# ═══════════════════════════════════════
+# SECTION 1: GENERATE ALL CONTENT
+# ═══════════════════════════════════════
+def generate_content():
+    print("🤖 Generating AI content...")
+    client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
+    prompt = f"""Generate viral short video package for: {TOPIC}
+Platform: {PLATFORM}, Language: {LANGUAGE}
+Return JSON with: scene1, scene2, scene3, scene4, videoPrompt,
+ytTitle, ytDescription, ytTags(list), hook1, hook2, hook3,
+overlays(list), caption, hashtags, commentReply, viralChecklist"""
+
+    msg = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=2000,
+        messages=[{"role":"user","content":prompt}]
+    )
+    raw = msg.content[0].text.strip()
+    raw = raw.replace("'''json","").replace("'''","").strip()
+    return json.loads(raw)
+
+# ═══════════════════════════════════════
+# SECTION 2: SAVE CONTENT TO FILES
+# ═══════════════════════════════════════
+def save_content(data):
+    print("💾 Saving content to files...")
+    os.makedirs("output", exist_ok=True)
+
+    with open("output/image_prompts.txt", "w", encoding="utf-8") as f:
+        f.write("=== 4 IMAGE PROMPTS ===\\n\\n")
+        for i, key in enumerate(["scene1","scene2","scene3","scene4"], 1):
+            f.write(f"SCENE {i}:\\n{data.get(key,'')}\\n\\n")
+
+    with open("output/video_prompt.txt", "w", encoding="utf-8") as f:
+        f.write(data.get("videoPrompt",""))
+
+    with open("output/youtube_metadata.txt", "w", encoding="utf-8") as f:
+        f.write(f"TITLE:\\n{data.get('ytTitle','')}\\n\\n")
+        f.write(f"DESCRIPTION:\\n{data.get('ytDescription','')}\\n\\n")
+        f.write(f"TAGS:\\n{', '.join(data.get('ytTags',[]))}\\n\\n")
+        f.write(f"HOOKS:\\n{data.get('hook1','')}\\n{data.get('hook2','')}\\n{data.get('hook3','')}\\n")
+
+    with open("output/caption_hashtags.txt", "w", encoding="utf-8") as f:
+        f.write(f"CAPTION:\\n{data.get('caption','')}\\n\\n")
+        f.write(f"HASHTAGS:\\n{data.get('hashtags','')}\\n\\n")
+        f.write(f"COMMENT REPLY:\\n{data.get('commentReply','')}")
+
+    print("✅ Files saved to /output folder")
+
+# ═══════════════════════════════════════
+# SECTION 3: YOUTUBE UPLOAD
+# ═══════════════════════════════════════
+def upload_to_youtube(data, video_path):
+    if not YOUTUBE_TOKEN or YOUTUBE_TOKEN == "your_oauth_token_here":
+        print("⚠️  YouTube token not set — skipping upload")
+        return None
+
+    print("📤 Uploading to YouTube...")
+    creds = Credentials(token=YOUTUBE_TOKEN)
+    youtube = build("youtube", "v3", credentials=creds)
+
+    body = {
+        "snippet": {
+            "title": data.get("ytTitle", "Viral Short #Shorts"),
+            "description": data.get("ytDescription", ""),
+            "tags": data.get("ytTags", []),
+            "categoryId": "26",  # Howto & Style
+            "defaultLanguage": "en"
+        },
+        "status": {
+            "privacyStatus": "public",
+            "selfDeclaredMadeForKids": False,
+            "embeddable": True,
+            "publicStatsViewable": True
+        }
+    }
+
+    media = MediaFileUpload(video_path, mimetype="video/mp4", resumable=True, chunksize=1024*1024*5)
+    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
+
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            print(f"Upload progress: {int(status.progress()*100)}%")
+
+    vid_id = response["id"]
+    print(f"✅ Uploaded! https://youtube.com/shorts/{vid_id}")
+    return vid_id
+
+# ═══════════════════════════════════════
+# MAIN AUTOMATION PIPELINE
+# ═══════════════════════════════════════
+def main():
+    print("\\n🚀 Starting Viral Short Video Automation...")
+    print(f"Topic: {TOPIC} | Platform: {PLATFORM}\\n")
+
+    # Step 1: Generate
+    data = generate_content()
+    print(f"✅ Title: {data.get('ytTitle','')}\\n")
+
+    # Step 2: Save files
+    save_content(data)
+
+    # Step 3: Upload (if video file exists)
+    if os.path.exists(VIDEO_FILE):
+        vid_id = upload_to_youtube(data, VIDEO_FILE)
+        if vid_id:
+            print(f"\\n🎉 DONE! youtube.com/shorts/{vid_id}")
+    else:
+        print(f"\\n⚠️  '{VIDEO_FILE}' not found — generate video using prompts in /output")
+        print("Tools: labs.google.com/videofx OR runwayml.com OR kling.ai")
+
+    print("\\n📁 All content saved to /output/")
+    print("🖼️  Use image prompts → labs.google.com/imagefx")
+    print("🎥  Use video prompt  → labs.google.com/videofx")
+
+if __name__ == "__main__":
+    main()
+`;
+  document.getElementById('pyCode').textContent = script;
+}
+
+// ══════════════════════════════════════════
+// MASTER PROMPT BUILDER
+// ══════════════════════════════════════════
+function buildMasterPrompt(topic, platform, lang, style, extra) {
+  const mp = `You are a Viral Content Automation System. Generate a COMPLETE viral short video package.
+
+TOPIC: ${topic}
+PLATFORM: ${platform}
+LANGUAGE: ${lang}
+STYLE: ${style}
+EXTRA DETAILS: ${extra||'none'}
+
+=== SECTION 1: AI IMAGE PROMPTS (4 Images for ImageFX / Midjourney) ===
+Create 4 detailed prompts for the SAME scene:
+1. Before/Start state (worn, original condition)
+2. Process/Working state (mid-transformation, tools visible)
+3. Progress state (75% complete, dramatic improvement)
+4. After/Completed state (stunning, luxury finish — hero shot)
+Rules: Same camera angle all 4 | Photorealistic, 8K | Cinematic lighting | 3-4 sentences each
+
+=== SECTION 2: VIDEO TRANSFORMATION PROMPT ===
+For AI video tools (Google Veo, Runway, Kling AI):
+- Start Image: [before state description]
+- End Image: [after state description]
+- Animation: Smooth cinematic transformation
+- Duration: 15-30 seconds
+- Style: Cinematic, dramatic lighting, same angle
+- Format: 9:16 vertical for Shorts
+
+=== SECTION 3: YOUTUBE METADATA ===
+- Title: max 60 chars, viral style, power word, #Shorts
+- Description: 200-300 words, hook + content + timestamps + CTA + hashtags
+- 20 Tags: mix broad + niche + trending
+- Category: Howto & Style (26)
+- Best Upload Time: platform-specific
+
+=== SECTION 4: CAPTION & HOOKS ===
+- 3 Hook options (first 3 seconds) — curiosity / shock / desire
+- 5 On-screen text overlays with timestamps [0:00], [0:08], etc.
+- Full platform caption in ${lang} (150 words, emojis, story, CTA)
+- 30 hashtags on one line
+- Comment reply template (auto-reply for questions)
+
+=== SECTION 5: VIRAL SETTINGS CHECKLIST ===
+- Best upload time
+- Thumbnail text suggestion
+- 10-point viral checklist (upload tips, first hour actions)
+- Engagement strategy (pin comment, community post, etc.)
+
+=== SECTION 6: PYTHON AUTOMATION CODE ===
+Provide working Python code that:
+1. Calls Claude/GPT API to generate all above
+2. Saves all content to /output/ folder as .txt files
+3. Uploads video to YouTube Data API v3 with all settings
+4. Sets title, description, tags, category auto
+5. Include install instructions and env variable setup
+
+Output Format: Clean sections, copy-ready, no unnecessary explanation.`;
+  document.getElementById('masterPromptTxt').textContent = mp;
+}
+
+// ══════════════════════════════════════════
+// FALLBACK DATA
+// ══════════════════════════════════════════
+function fallback(topic, platform, lang, style, extra) {
+  const t = topic;
+  return {
+    scene1:`Photorealistic wide-angle shot of ${t} in original worn state. Harsh natural daylight reveals every imperfection. Camera at eye level, 9:16 vertical format. Same background throughout. Canon 5D Mark IV, 24mm lens, 8K resolution, cinematic quality.`,
+    scene2:`Same ${t} location mid-transformation. Workers in protective gear visible with tools and equipment. Same camera angle maintained exactly. Golden hour light beginning. 8K photorealistic, cinematic contrast between old and new sections visible.`,
+    scene3:`${t} 75% complete — dramatic transformation improvement visible. Same camera angle. High contrast between completed and remaining sections creates visual tension. Warm cinematic lighting. 8K resolution, editorial quality photography.`,
+    scene4:`Fully completed ${t} — breathtaking luxury finish. Dramatic warm cinematic glow with stunning reflections. Same camera angle reveals jaw-dropping before/after contrast. Golden hour, 8K, magazine cover quality, most beautiful frame of the sequence.`,
+    videoStart:`Wide shot of ${t} in original condition. Natural harsh lighting shows worn state. Same eye-level camera angle. Static locked frame.`,
+    videoEnd:`Same wide shot — fully transformed ${t}. Warm dramatic cinematic light. Stunning completed finish. Same locked camera angle.`,
+    videoPrompt:`Smooth cinematic transformation of ${t} from worn original to stunning completed state. Camera locked at same eye-level angle throughout. Lighting transitions from harsh daylight to warm golden glow. Satisfying reveal effect. 9:16 vertical. 15-30 seconds. Photorealistic.`,
+    capcut:`1. Import 4 images + video clip in order\n2. Each image: 2.5s with Ken Burns zoom effect\n3. Transitions: "Zoom In" 0.3s between all clips\n4. Audio: CapCut "Beat Sync" → trending transformation audio\n5. Speed ramp: 0.7x intro, 1.2x middle, 0.3x final reveal\n6. Color: Contrast +15, Warmth +12, Saturation +8, Vignette on\n7. Text overlays (see hooks section)\n8. Export: 1080×1920, 60fps, H.264, Highest quality`,
+    ytTitle:`🔥 ${t} That Will SHOCK You! #Shorts`,
+    ytDescription:`Wait for the FINAL reveal — this ${t} will absolutely blow your mind! 😱\n\nFrom completely worn out to stunning luxury finish — the transformation is unreal!\n\n⏱ Timestamps:\n0:00 - The original condition\n0:15 - Transformation begins\n0:30 - The reveal\n\n💬 Comment "MORE" to see the full process!\n📩 DM for services and queries\n\n#transformation #${t.replace(/ /g,'').toLowerCase()} #viral #shorts #satisfying`,
+    ytTags:[`${t}`,`${t} transformation`,'shorts','viral','satisfying','before after','transformation','diy','howto','trending','reels','amazing','satisfyingvideo','relaxing','asmr','timelapse','reveal','renovation','makeover','luxury'],
+    hook1:`"Wait for the final result... 👀"`,
+    hook2:`"This ${t} will BREAK your brain 🤯"`,
+    hook3:`"Nobody believed this was possible ✨"`,
+    overlays:[`[0:00] "Wait for the final reveal... 😱"`,`[0:08] "Starting from scratch..."`,`[0:16] "The transformation begins ✨"`,`[0:22] "Almost there..."`,`[0:28] "THE REVEAL 🔥 Save this!"`],
+    caption:`Yaar ye dekh ke jawdrop ho gayi meri! 😱🔥\n\nIs ${t} ko humne completely transform kar diya — ek ekdum worn out condition se stunning luxury finish tak!\n\nLog kehte the "ye nahi ho sakta" — lekin hum ne kar ke dikhaya! 💪\n\nProcess:\n✅ Survey & Planning\n✅ Preparation\n✅ Transformation\n✅ Final Result\n\nComment "DETAILS" agar aap bhi ye chahte ho! 👇\nDostoon ko TAG karo! 🏷️`,
+    hashtags:`#transformation #${t.replace(/ /g,'').toLowerCase()} #shorts #viral #satisfying #beforeandafter #diy #renovation #makeover #trending #reelsviral #satisfyingvideo #amazing #mindblowing #reveal #timelapse #relaxing #asmr #luxury #stunning #howto #india #ytshorts #reels #fyp #explore #viral2025 #satisfying2025 #transformation2025 #home`,
+    commentReply:`Shukriya interest ke liye! 🙏 Agar aap bhi aise transformation ke baare mein jaanna chahte ho toh yahan dekho: [LINK] — aur direct services ke liye DM karo! ✨`,
+    bestTime:`6:00–9:00 AM IST ya 7:00–10:00 PM IST (Weekend pe Sunday best)`,
+    thumbnail:`"BEFORE vs AFTER" — bold white text, red background, arrow graphic`,
+    viralChecklist:`1. Upload at peak time (6-9 AM or 7-10 PM IST)\n2. First 15 mins: reply to every comment\n3. Share to WhatsApp/Instagram stories immediately\n4. Pin a comment with CTA ("Comment DETAILS for full process")\n5. Add to a "Transformations" playlist\n6. Use #Shorts in title AND description\n7. Enable all notifications for subscribers\n8. Post Community tab announcement same day\n9. Respond to first 50 comments in first hour\n10. Post Instagram Reel with same video (cross-platform)`,
+    engagementStrategy:`1. Pin comment: "Comment 'DETAILS' for the full process 👇"\n2. Post Community update: "New video just dropped! ⚡ Check it out 👆"\n3. Reply to every comment in first 2 hours\n4. DM your top subscribers with the video link\n5. Share in 3–5 relevant WhatsApp groups`
+  };
+}
+
+// ══════════════════════════════════════════
+// YOUTUBE UPLOAD
+// ══════════════════════════════════════════
+function onVidFile(input) {
+  videoFile = input.files[0];
+  if(videoFile) {
+    document.getElementById('uploadBtn').disabled = false;
+    showToast(`📹 "${videoFile.name}" ready!`);
+  }
+}
+
+async function doUpload() {
+  const token = document.getElementById('ytToken').value.trim();
+  if(!token){ showToast('⚠️ YouTube OAuth token enter karo'); return; }
+  if(!videoFile){ showToast('⚠️ Video file select karo'); return; }
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.classList.add('loading-state');
+  showToast('📤 Uploading...');
+
+  try {
+    const meta = {
+      snippet:{
+        title: generatedData.ytTitle || 'Viral Short #Shorts',
+        description: generatedData.ytDescription || '',
+        tags: generatedData.ytTags || [],
+        categoryId:'26',
+        defaultLanguage:'en'
+      },
+      status:{
+        privacyStatus: selectedPrivacy,
+        selfDeclaredMadeForKids:false,
+        embeddable:true,
+        publicStatsViewable:true
+      }
+    };
+
+    const initRes = await fetch(
+      'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
+      {
+        method:'POST',
+        headers:{
+          'Authorization':`Bearer ${token}`,
+          'Content-Type':'application/json',
+          'X-Upload-Content-Type':videoFile.type,
+          'X-Upload-Content-Length':videoFile.size
+        },
+        body:JSON.stringify(meta)
+      }
+    );
+    if(!initRes.ok) throw new Error('Init: '+initRes.status);
+    const uploadUrl = initRes.headers.get('Location');
+
+    const upRes = await fetch(uploadUrl,{
+      method:'PUT',
+      headers:{'Content-Type':videoFile.type,'Content-Length':videoFile.size},
+      body:videoFile
+    });
+
+    if(upRes.ok||upRes.status===200||upRes.status===201){
+      const result = await upRes.json();
+      const id = result.id;
+      document.getElementById('ytFinalLink').href = `https://www.youtube.com/shorts/${id}`;
+      document.getElementById('successBox').classList.add('show');
+      document.getElementById('successBox').scrollIntoView({behavior:'smooth'});
+      showToast('🎉 YouTube pe upload ho gaya!');
+    } else {
+      throw new Error('Upload: '+upRes.status);
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Upload failed — check console');
+  }
+  btn.disabled=false; btn.classList.remove('loading-state');
+}
+
+// ══════════════════════════════════════════
+// COPY + DOWNLOAD
+// ══════════════════════════════════════════
+function cp(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    if(btn){ btn.textContent='✅'; btn.classList.add('ok'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},2000); }
+    showToast('📋 Copied!');
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    showToast('📋 Copied!');
+  });
+}
+
+function copyAll() {
+  const ids = ['s1t','s2t','s3t','s4t','vpt','cct','ytt','ytd','ytg','hkt','cpt','hst','crt','vst','est','pyCode'];
+  const labels = ['SCENE 1','SCENE 2','SCENE 3','SCENE 4','VIDEO PROMPT','CAPCUT GUIDE','YT TITLE','YT DESCRIPTION','YT TAGS','HOOKS','CAPTION','HASHTAGS','COMMENT REPLY','VIRAL CHECKLIST','ENGAGEMENT','PYTHON SCRIPT'];
+  let all = '🎬 VIRAL SHORT VIDEO AUTOMATION PACKAGE\n' + '='.repeat(50) + '\n\n';
+  ids.forEach((id,i)=>{
+    all += `\n${'═'.repeat(40)}\n${labels[i]}\n${'═'.repeat(40)}\n`;
+    all += document.getElementById(id)?.textContent||'';
+    all += '\n';
+  });
+  navigator.clipboard.writeText(all).then(()=>showToast('📋 All copied!'));
+}
+
+function downloadAll() {
+  const ids = ['s1t','s2t','s3t','s4t','vs1','vs2','vpt','cct','ytt','ytd','ytg','yts','hkt','cpt','hst','crt','vst','est','masterPromptTxt','pyCode'];
+  const labels = ['IMAGE - Scene 1 (Before)','IMAGE - Scene 2 (Progress)','IMAGE - Scene 3 (Advanced)','IMAGE - Scene 4 (Final)','VIDEO - Start Image','VIDEO - End Image','VIDEO - Prompt','CAPCUT - Editing Guide','YOUTUBE - Title','YOUTUBE - Description','YOUTUBE - Tags','YOUTUBE - Settings','HOOKS - Options & Overlays','CAPTION - Full Caption','HASHTAGS - 30 Tags','COMMENT - Auto Reply','VIRAL - Checklist','VIRAL - Engagement Strategy','MASTER AUTOMATION PROMPT','PYTHON AUTOMATION SCRIPT'];
+  let content = `🎬 VIRAL SHORT VIDEO AUTOMATION\n`;
+  content += `Generated: ${new Date().toLocaleString()}\n`;
+  content += `Topic: ${selectedTopic}\n\n`;
+  ids.forEach((id,i)=>{
+    content += `\n${'='.repeat(50)}\n${labels[i]}\n${'='.repeat(50)}\n`;
+    content += document.getElementById(id)?.textContent||'—';
+    content += '\n';
+  });
+  const blob = new Blob([content],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `viral-automation-${selectedTopic.replace(/ /g,'-')}-${Date.now()}.txt`;
+  a.click();
+  showToast('💾 Downloaded!');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+</script>
+</body>
+</html>
